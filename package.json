@@ -1,16 +1,18 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-inboxer",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "An Obsidian plugin to add entries to INBOX and TIMELINE sections",
 	"main": "main.js",
 	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+		"dev": "bun esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && bun esbuild.config.mjs production",
+		"version": "bun version-bump.mjs && git add manifest.json versions.json"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT",
+	"keywords": [
+		"obsidian",
+		"plugin"
+	],
+	"author": "Eoin H",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",

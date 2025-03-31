@@ -1,89 +1,196 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {
+	App,
+	Editor,
+	MarkdownView,
+	Modal,
+	Notice,
+	Plugin,
+	PluginSettingTab,
+	Setting,
+} from "obsidian";
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
-	mySetting: string;
+interface InboxTimelineSettings {
+	inboxHeadingText: string;
+	timelineHeadingText: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
+const DEFAULT_SETTINGS: InboxTimelineSettings = {
+	inboxHeadingText: "INBOX",
+	timelineHeadingText: "TIMELINE",
+};
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class InboxTimelinePlugin extends Plugin {
+	settings: InboxTimelineSettings;
 
 	async onload() {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
-		// This adds a simple command that can be triggered anywhere
+		// Register the Add to Inbox command
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
+			id: "add-to-inbox",
+			name: "Add to Inbox",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
+				this.addToInbox(editor);
+			},
 		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
+
+		// Register the Add to Timeline command
 		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-			}
+			id: "add-to-timeline",
+			name: "Add to Timeline",
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.addToTimeline(editor);
+			},
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		// Add settings tab
+		this.addSettingTab(new InboxTimelineSettingTab(this.app, this));
 	}
 
-	onunload() {
+	/**
+	 * Find the last occurrence of a heading in the document or create it if it doesn't exist
+	 *
+	 * @param editor The active editor
+	 * @param headingText The text to search for in headings
+	 * @returns Object containing the position and level of the heading
+	 */
+	findOrCreateHeading(
+		editor: Editor,
+		headingText: string,
+	): { pos: { line: number; ch: number }; level: number } {
+		const content = editor.getValue();
+		const lines = content.split("\n");
 
+		// Search for heading in reverse order (last to first)
+		for (let i = lines.length - 1; i >= 0; i--) {
+			const match = lines[i].match(/^(#{1,6})\s+(.+)$/);
+			if (match && match[2].trim() === headingText) {
+				return {
+					pos: { line: i, ch: lines[i].length },
+					level: match[1].length,
+				};
+			}
+		}
+
+		// Create heading if not found
+		const newHeadingLine = `\n## ${headingText}\n`;
+		const lastLine = editor.lastLine();
+		editor.replaceRange(newHeadingLine, {
+			line: lastLine,
+			ch: editor.getLine(lastLine).length,
+		});
+
+		return {
+			pos: { line: lastLine + 1, ch: 0 },
+			level: 2, // New headings are level 2
+		};
+	}
+
+	/**
+	 * Find the position to insert a new child heading
+	 *
+	 * @param editor The active editor
+	 * @param headingPos The position of the parent heading
+	 * @param headingLevel The level of the parent heading
+	 * @returns Position to insert the new child heading
+	 */
+	findInsertionPoint(
+		editor: Editor,
+		headingPos: { line: number; ch: number },
+		headingLevel: number,
+	): { line: number; ch: number } {
+		const content = editor.getValue();
+		const lines = content.split("\n");
+
+		let currentLine = headingPos.line + 1;
+		let lastChildLine = headingPos.line;
+
+		while (currentLine < lines.length) {
+			const match = lines[currentLine].match(/^(#{1,6})\s+.+$/);
+
+			if (match) {
+				const level = match[1].length;
+
+				if (level <= headingLevel) {
+					// Found next heading of same or higher level, stop searching
+					break;
+				}
+
+				if (level === headingLevel + 1) {
+					// Found a direct child heading
+					lastChildLine = currentLine;
+				}
+			}
+
+			currentLine++;
+		}
+
+		// If we didn't find any child headings, add right after the parent heading
+		// Otherwise, add after the last child
+		return {
+			line: lastChildLine,
+			ch: lines[lastChildLine].length,
+		};
+	}
+
+	/**
+	 * Add a new child heading under the INBOX heading
+	 *
+	 * @param editor The active editor
+	 */
+	addToInbox(editor: Editor) {
+		const { pos, level } = this.findOrCreateHeading(
+			editor,
+			this.settings.inboxHeadingText,
+		);
+		const insertPos = this.findInsertionPoint(editor, pos, level);
+
+		const childHeadingText = `\n${"#".repeat(level + 1)} `;
+		editor.replaceRange(childHeadingText, insertPos);
+
+		// Place cursor after the heading syntax
+		editor.setCursor({
+			line: insertPos.line + 1,
+			ch: level + 2, // +2 accounts for the # chars plus the space
+		});
+	}
+
+	/**
+	 * Add a new child heading under the TIMELINE heading with a timestamp
+	 *
+	 * @param editor The active editor
+	 */
+	addToTimeline(editor: Editor) {
+		const { pos, level } = this.findOrCreateHeading(
+			editor,
+			this.settings.timelineHeadingText,
+		);
+		const insertPos = this.findInsertionPoint(editor, pos, level);
+
+		// Format the current date and time
+		const now = new Date();
+		const timestamp = now
+			.toISOString()
+			.replace(/T/, " ")
+			.replace(/\..+/, "")
+			.slice(0, 16); // Format as YYYY-MM-DD HH:MM
+
+		const childHeadingText = `\n${"#".repeat(level + 1)} ${timestamp} `;
+		editor.replaceRange(childHeadingText, insertPos);
+
+		// Place cursor after the timestamp
+		editor.setCursor({
+			line: insertPos.line + 1,
+			ch: childHeadingText.length - 1,
+		});
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign(
+			{},
+			DEFAULT_SETTINGS,
+			await this.loadData(),
+		);
 	}
 
 	async saveSettings() {
@@ -91,44 +198,49 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
+class InboxTimelineSettingTab extends PluginSettingTab {
+	plugin: InboxTimelinePlugin;
 
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: InboxTimelinePlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
 
 	display(): void {
-		const {containerEl} = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 
+		containerEl.createEl("h2", { text: "Inbox & Timeline Settings" });
+
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
+			.setName("Inbox heading text")
+			.setDesc(
+				"The text to search for when finding/creating the inbox heading",
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("INBOX")
+					.setValue(this.plugin.settings.inboxHeadingText)
+					.onChange(async (value) => {
+						this.plugin.settings.inboxHeadingText = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Timeline heading text")
+			.setDesc(
+				"The text to search for when finding/creating the timeline heading",
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("TIMELINE")
+					.setValue(this.plugin.settings.timelineHeadingText)
+					.onChange(async (value) => {
+						this.plugin.settings.timelineHeadingText = value;
+						await this.plugin.saveSettings();
+					}),
+			);
 	}
 }
