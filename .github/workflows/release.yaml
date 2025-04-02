@@ -52,13 +52,13 @@ jobs:
                   if ! node -e "const vs=require('./versions.json'); if(!vs['$VERSION']) throw 'Version not found'"; then
                     echo "⚠️ Warning: Version $VERSION not found in versions.json"
                   fi
-
-            - name: Commit CHANGELOG.md
-              uses: stefanzweifel/git-auto-commit-action@v4
+            - name: Update CHANGELOG
+              id: changelog
+              uses: requarks/changelog-action@v1
               with:
-                  branch: master
-                  commit_message: "docs: update CHANGELOG.md for ${{ env.VERSION }} [skip ci]"
-                  file_pattern: CHANGELOG.md
+                  token: ${{ github.token }}
+                  tag: ${{ env.VERSION }}
+
             - name: Package plugin
               run: |
                   mkdir -p release
@@ -78,6 +78,9 @@ jobs:
                       ## Inboxer v${{ env.VERSION }}
 
                       Please refer to the [changelog](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for details.
+
+                      ### Changes
+                      ${{ changelog.changes }}
 
                       ### Installation
                       1. Download the release zip file
