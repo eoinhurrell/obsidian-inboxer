@@ -1,6 +1,6 @@
 {
-	"id": "obsidian-inboxer",
-	"name": "Obsidian Inboxer",
+	"id": "inboxer",
+	"name": "Inboxer",
 	"version": "1.1.0",
 	"minAppVersion": "0.15.0",
 	"description": "Adds commands to quickly add entries to INBOX and TIMELINE sections",
@@ -8,3 +8,4 @@
 	"authorUrl": "https://github.com/eoinhurrell",
 	"isDesktopOnly": false
 }
+
