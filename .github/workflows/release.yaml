@@ -55,7 +55,7 @@ jobs:
             - name: Commit CHANGELOG.md
               uses: stefanzweifel/git-auto-commit-action@v4
               with:
-                  branch: main
+                  branch: master
                   commit_message: "docs: update CHANGELOG.md for ${{ env.VERSION }} [skip ci]"
                   file_pattern: CHANGELOG.md
             - name: Package plugin
@@ -69,14 +69,14 @@ jobs:
                   zip -r obsidian-inboxer-$VERSION.zip ./*
                   mv obsidian-inboxer-$VERSION.zip ../
             - name: Create GitHub Release
-              uses: softprops/action-gh-release@v1
+              uses: softprops/action-gh-release@v2
               with:
                   files: obsidian-inboxer-*.zip
                   name: Version ${{ env.VERSION }}
                   body: |
                       ## Inboxer v${{ env.VERSION }}
 
-                      Please refer to the [changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+                      Please refer to the [changelog](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for details.
 
                       ### Installation
                       1. Download the release zip file
