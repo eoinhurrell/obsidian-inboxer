@@ -2,6 +2,8 @@ name: Release Obsidian Plugin
 
 on:
     push:
+        branches:
+            - main
         tags:
             - "[0-9]+.[0-9]+.[0-9]+" # Matches standard semantic version tags without "v" prefix
 
@@ -21,7 +23,7 @@ jobs:
             - name: Get version from tag
               id: get_version
               run: |
-                  # Extract version from tag (v1.0.0 -> 1.0.0)
+                  # Extract version from tag
                   VERSION=${GITHUB_REF_NAME#v}
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
                   echo "Building release for version: $VERSION"
@@ -50,6 +52,11 @@ jobs:
                     echo "⚠️ Warning: Version $VERSION not found in versions.json"
                   fi
 
+            - name: Semantic Changelog Generator
+              uses: nielstenboom/semantic-changelog-generator@v1.2.0
+              with:
+                  base: ${{ env.VERSION }}
+                  head: main
             - name: Package plugin
               run: |
                   mkdir -p release
@@ -58,16 +65,15 @@ jobs:
 
                   # Create zip file
                   cd release
-                  zip -r inbox-timeline-plugin-$VERSION.zip ./*
-                  mv inbox-timeline-plugin-$VERSION.zip ../
-
+                  zip -r obsidian-inboxer-$VERSION.zip ./*
+                  mv obsidian-inboxer-$VERSION.zip ../
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v1
               with:
-                  files: inbox-timeline-plugin-*.zip
+                  files: obsidian-inboxer-*.zip
                   name: Version ${{ env.VERSION }}
                   body: |
-                      ## Inbox & Timeline Plugin v${{ env.VERSION }}
+                      ## Inboxer v${{ env.VERSION }}
 
                       Please refer to the [changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
 
