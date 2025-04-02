@@ -1,0 +1,80 @@
+name: Release Obsidian Plugin
+
+on:
+    push:
+        tags:
+            - "v*" # Trigger on tags that start with 'v'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v1
+              with:
+                  bun-version: latest
+
+            - name: Get version from tag
+              id: get_version
+              run: |
+                  # Extract version from tag (v1.0.0 -> 1.0.0)
+                  VERSION=${GITHUB_REF_NAME#v}
+                  echo "VERSION=$VERSION" >> $GITHUB_ENV
+                  echo "Building release for version: $VERSION"
+
+            - name: Install dependencies
+              run: bun install
+
+            - name: Build plugin
+              run: bun run build
+
+            - name: Verify versions match
+              run: |
+                  # Check if tag version matches package.json, manifest.json and exists in versions.json
+                  PKG_VERSION=$(node -p "require('./package.json').version")
+                  MANIFEST_VERSION=$(node -p "require('./manifest.json').version")
+
+                  if [[ "$PKG_VERSION" != "$VERSION" ]]; then
+                    echo "⚠️ Warning: Tag version ($VERSION) doesn't match package.json version ($PKG_VERSION)"
+                  fi
+
+                  if [[ "$MANIFEST_VERSION" != "$VERSION" ]]; then
+                    echo "⚠️ Warning: Tag version ($VERSION) doesn't match manifest.json version ($MANIFEST_VERSION)"
+                  fi
+
+                  if ! node -e "const vs=require('./versions.json'); if(!vs['$VERSION']) throw 'Version not found'"; then
+                    echo "⚠️ Warning: Version $VERSION not found in versions.json"
+                  fi
+
+            - name: Package plugin
+              run: |
+                  mkdir -p release
+                  cp main.js manifest.json versions.json release/
+                  if [ -f styles.css ]; then cp styles.css release/; fi
+
+                  # Create zip file
+                  cd release
+                  zip -r inbox-timeline-plugin-$VERSION.zip ./*
+                  mv inbox-timeline-plugin-$VERSION.zip ../
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: inbox-timeline-plugin-*.zip
+                  name: Version ${{ env.VERSION }}
+                  body: |
+                      ## Inbox & Timeline Plugin v${{ env.VERSION }}
+
+                      Please refer to the [changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+
+                      ### Installation
+                      1. Download the release zip file
+                      2. Unzip in your Obsidian vault's plugins folder: `.obsidian/plugins/`
+                      3. Enable the plugin in Obsidian settings
+                  draft: false
+                  prerelease: false
+                  token: ${{ secrets.GITHUB_TOKEN }}
