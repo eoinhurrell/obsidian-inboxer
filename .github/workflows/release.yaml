@@ -3,7 +3,7 @@ name: Release Obsidian Plugin
 on:
     push:
         tags:
-            - "v*" # Trigger on tags that start with 'v'
+            - "[0-9]+.[0-9]+.[0-9]+" # Matches standard semantic version tags without "v" prefix
 
 jobs:
     build:
