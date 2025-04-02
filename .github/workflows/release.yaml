@@ -89,3 +89,10 @@ jobs:
                   draft: false
                   prerelease: false
                   token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Commit CHANGELOG.md
+              uses: stefanzweifel/git-auto-commit-action@v4
+              with:
+                  branch: master
+                  commit_message: "docs: update CHANGELOG.md for v${{ env.VERSION }} [skip ci]"
+                  file_pattern: CHANGELOG.md
