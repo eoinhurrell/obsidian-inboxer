@@ -15,18 +15,21 @@ build:
 patch:
 	npm version patch
 	bun run build
+	git push && git push origin $(shell git describe --tags --abbrev=0)
 	@echo "Patch version released"
 
 # Bump minor version, build, and create release
 minor:
 	npm version minor
 	bun run build
+	git push && git push origin $(shell git describe --tags --abbrev=0)
 	@echo "Minor version released"
 
 # Bump major version, build, and create release
 major:
 	npm version major
 	bun run build
+	git push && git push origin $(shell git describe --tags --abbrev=0)
 	@echo "Major version released"
 
 # Help command
