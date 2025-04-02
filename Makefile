@@ -15,6 +15,7 @@ build:
 patch:
 	npm version patch
 	bun run build
+	sleep 1
 	git push && git push origin $(shell git describe --tags --abbrev=0)
 	@echo "Patch version released"
 
@@ -22,6 +23,7 @@ patch:
 minor:
 	npm version minor
 	bun run build
+	sleep 1
 	git push && git push origin $(shell git describe --tags --abbrev=0)
 	@echo "Minor version released"
 
@@ -29,6 +31,7 @@ minor:
 major:
 	npm version major
 	bun run build
+	sleep 1
 	git push && git push origin $(shell git describe --tags --abbrev=0)
 	@echo "Major version released"
 
@@ -37,5 +40,6 @@ help:
 	@echo "Available commands:"
 	@echo "  make dev    - Run development server with Bun"
 	@echo "  make build  - Build the plugin"
+	@echo "  make patch  - Bump patch version, build, and release"
 	@echo "  make minor  - Bump minor version, build, and release"
 	@echo "  make major  - Bump major version, build, and release"
