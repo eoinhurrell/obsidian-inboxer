@@ -80,7 +80,7 @@ jobs:
                       Please refer to the [changelog](https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md) for details.
 
                       ### Changes
-                      ${{ steps.changelog.changes }}
+                      ${{ steps.changelog.outputs.changes }}
 
                       ### Installation
                       1. Download the release zip file
