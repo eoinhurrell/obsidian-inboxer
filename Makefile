@@ -11,6 +11,12 @@ dev:
 build:
 	bun run build
 
+# Bump patch version, build, and create release
+patch:
+	npm version patch
+	bun run build
+	@echo "Patch version released"
+
 # Bump minor version, build, and create release
 minor:
 	npm version minor
