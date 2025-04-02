@@ -52,11 +52,12 @@ jobs:
                     echo "⚠️ Warning: Version $VERSION not found in versions.json"
                   fi
 
-            - name: Semantic Changelog Generator
-              uses: nielstenboom/semantic-changelog-generator@v1.2.0
+            - name: Commit CHANGELOG.md
+              uses: stefanzweifel/git-auto-commit-action@v4
               with:
-                  base: ${{ env.VERSION }}
-                  head: main
+                  branch: main
+                  commit_message: "docs: update CHANGELOG.md for ${{ env.VERSION }} [skip ci]"
+                  file_pattern: CHANGELOG.md
             - name: Package plugin
               run: |
                   mkdir -p release
