@@ -1,9 +1,8 @@
+// main.ts
 import {
 	App,
 	Editor,
 	MarkdownView,
-	Modal,
-	Notice,
 	Plugin,
 	PluginSettingTab,
 	Setting,
@@ -102,34 +101,34 @@ export default class InboxTimelinePlugin extends Plugin {
 		const content = editor.getValue();
 		const lines = content.split("\n");
 
+		// Start after the parent heading
+		let insertAfterLine = headingPos.line;
 		let currentLine = headingPos.line + 1;
-		let lastChildLine = headingPos.line;
 
+		// Scan through the document
 		while (currentLine < lines.length) {
 			const match = lines[currentLine].match(/^(#{1,6})\s+.+$/);
 
 			if (match) {
+				// Found a heading
 				const level = match[1].length;
 
 				if (level <= headingLevel) {
-					// Found next heading of same or higher level, stop searching
+					// Found next heading of same or higher level than parent
+					// This means we've exited the parent's section, so stop
 					break;
-				}
-
-				if (level === headingLevel + 1) {
-					// Found a direct child heading
-					lastChildLine = currentLine;
 				}
 			}
 
+			// Keep track of last line we've seen under the parent heading or its children
+			insertAfterLine = currentLine;
 			currentLine++;
 		}
 
-		// If we didn't find any child headings, add right after the parent heading
-		// Otherwise, add after the last child
+		// Insert after the last line in the parent's section
 		return {
-			line: lastChildLine,
-			ch: lines[lastChildLine].length,
+			line: insertAfterLine,
+			ch: lines[insertAfterLine].length,
 		};
 	}
 
