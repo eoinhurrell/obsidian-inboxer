@@ -4,6 +4,7 @@
 	"description": "An Obsidian plugin to add entries to INBOX and TIMELINE sections",
 	"main": "main.js",
 	"scripts": {
+		"test": "bun test",
 		"dev": "bun esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && bun esbuild.config.mjs production",
 		"version": "bun version-bump.mjs && git add manifest.json versions.json"
@@ -12,8 +13,9 @@
 		"obsidian",
 		"plugin"
 	],
-	"author": "Eoin H",
+	"author": "Eoin Hurrell",
 	"devDependencies": {
+		"@types/bun": "^1.2.9",
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
