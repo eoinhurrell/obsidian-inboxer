@@ -8,18 +8,18 @@ import {
 	Setting,
 } from "obsidian";
 
-interface InboxTimelineSettings {
+interface InboxerSettings {
 	inboxHeadingText: string;
 	timelineHeadingText: string;
 }
 
-const DEFAULT_SETTINGS: InboxTimelineSettings = {
+const DEFAULT_SETTINGS: InboxerSettings = {
 	inboxHeadingText: "INBOX",
 	timelineHeadingText: "TIMELINE",
 };
 
-export default class InboxTimelinePlugin extends Plugin {
-	settings: InboxTimelineSettings;
+export default class InboxerPlugin extends Plugin {
+	settings: InboxerSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -43,7 +43,7 @@ export default class InboxTimelinePlugin extends Plugin {
 		});
 
 		// Add settings tab
-		this.addSettingTab(new InboxTimelineSettingTab(this.app, this));
+		this.addSettingTab(new InboxerSettingTab(this.app, this));
 	}
 
 	/**
@@ -197,10 +197,10 @@ export default class InboxTimelinePlugin extends Plugin {
 	}
 }
 
-class InboxTimelineSettingTab extends PluginSettingTab {
-	plugin: InboxTimelinePlugin;
+class InboxerSettingTab extends PluginSettingTab {
+	plugin: InboxerPlugin;
 
-	constructor(app: App, plugin: InboxTimelinePlugin) {
+	constructor(app: App, plugin: InboxerPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
