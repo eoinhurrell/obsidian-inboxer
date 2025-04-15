@@ -26,7 +26,7 @@ export default class InboxTimelinePlugin extends Plugin {
 
 		// Register the Add to Inbox command
 		this.addCommand({
-			id: "add-to-inbox",
+			id: "inboxer-add-to-inbox",
 			name: "Add to Inbox",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				this.addToInbox(editor);
@@ -35,7 +35,7 @@ export default class InboxTimelinePlugin extends Plugin {
 
 		// Register the Add to Timeline command
 		this.addCommand({
-			id: "add-to-timeline",
+			id: "inboxer-add-to-timeline",
 			name: "Add to Timeline",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				this.addToTimeline(editor);
