@@ -1,11 +1,11 @@
 # Inboxer, an Obsidian Plugin
 
-A simple Obsidian plugin that helps you organize notes with dedicated inbox and timeline sections.
+A simple Obsidian plugin that helps you organize notes with dedicated inbox and timeline sections. I made this to use with daily notes or project notes, to keep a running inbox and a running timeline of events.
 
 ## Features
 
--   **Add to Inbox**: Add new headings under an "INBOX" section
--   **Add to Timeline**: Add timestamped entries under a "TIMELINE" section
+- **Add to Inbox**: Add new headings under an "INBOX" section
+- **Add to Timeline**: Add timestamped entries under a "TIMELINE" section
 
 ## Settings
 
