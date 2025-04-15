@@ -1,4 +1,3 @@
-// main.ts
 import {
 	App,
 	Editor,
@@ -7,6 +6,16 @@ import {
 	PluginSettingTab,
 	Setting,
 } from "obsidian";
+
+import {
+	findHeadingInText,
+	findInsertionPointInText,
+	createHeadingText,
+	createChildHeadingText,
+	createTimelineHeadingText,
+	calculateCursorPosition,
+	HeadingInfo,
+} from "./utils/document-utils";
 
 interface InboxerSettings {
 	inboxHeadingText: string;
@@ -53,82 +62,29 @@ export default class InboxerPlugin extends Plugin {
 	 * @param headingText The text to search for in headings
 	 * @returns Object containing the position and level of the heading
 	 */
-	findOrCreateHeading(
-		editor: Editor,
-		headingText: string,
-	): { pos: { line: number; ch: number }; level: number } {
+	findOrCreateHeading(editor: Editor, headingText: string): HeadingInfo {
 		const content = editor.getValue();
-		const lines = content.split("\n");
+		const headingInfo = findHeadingInText(content, headingText);
 
-		// Search for heading in reverse order (last to first)
-		for (let i = lines.length - 1; i >= 0; i--) {
-			const match = lines[i].match(/^(#{1,6})\s+(.+)$/);
-			if (match && match[2].trim() === headingText) {
-				return {
-					pos: { line: i, ch: lines[i].length },
-					level: match[1].length,
-				};
-			}
+		if (headingInfo) {
+			return headingInfo;
 		}
 
 		// Create heading if not found
-		const newHeadingLine = `\n## ${headingText}\n`;
+		const newHeadingText = createHeadingText(headingText);
 		const lastLine = editor.lastLine();
-		editor.replaceRange(newHeadingLine, {
+		const lastLineContent = editor.getLine(lastLine);
+
+		const insertPosition = {
 			line: lastLine,
-			ch: editor.getLine(lastLine).length,
-		});
+			ch: lastLineContent.length,
+		};
+
+		editor.replaceRange(newHeadingText, insertPosition);
 
 		return {
 			pos: { line: lastLine + 1, ch: 0 },
 			level: 2, // New headings are level 2
-		};
-	}
-
-	/**
-	 * Find the position to insert a new child heading
-	 *
-	 * @param editor The active editor
-	 * @param headingPos The position of the parent heading
-	 * @param headingLevel The level of the parent heading
-	 * @returns Position to insert the new child heading
-	 */
-	findInsertionPoint(
-		editor: Editor,
-		headingPos: { line: number; ch: number },
-		headingLevel: number,
-	): { line: number; ch: number } {
-		const content = editor.getValue();
-		const lines = content.split("\n");
-
-		// Start after the parent heading
-		let insertAfterLine = headingPos.line;
-		let currentLine = headingPos.line + 1;
-
-		// Scan through the document
-		while (currentLine < lines.length) {
-			const match = lines[currentLine].match(/^(#{1,6})\s+.+$/);
-
-			if (match) {
-				// Found a heading
-				const level = match[1].length;
-
-				if (level <= headingLevel) {
-					// Found next heading of same or higher level than parent
-					// This means we've exited the parent's section, so stop
-					break;
-				}
-			}
-
-			// Keep track of last line we've seen under the parent heading or its children
-			insertAfterLine = currentLine;
-			currentLine++;
-		}
-
-		// Insert after the last line in the parent's section
-		return {
-			line: insertAfterLine,
-			ch: lines[insertAfterLine].length,
 		};
 	}
 
@@ -142,16 +98,16 @@ export default class InboxerPlugin extends Plugin {
 			editor,
 			this.settings.inboxHeadingText,
 		);
-		const insertPos = this.findInsertionPoint(editor, pos, level);
 
-		const childHeadingText = `\n${"#".repeat(level + 1)} `;
+		const content = editor.getValue();
+		const insertPos = findInsertionPointInText(content, pos, level);
+		const childHeadingText = createChildHeadingText(level);
+
 		editor.replaceRange(childHeadingText, insertPos);
 
 		// Place cursor after the heading syntax
-		editor.setCursor({
-			line: insertPos.line + 1,
-			ch: level + 2, // +2 accounts for the # chars plus the space
-		});
+		const cursorPos = calculateCursorPosition(insertPos, childHeadingText);
+		editor.setCursor(cursorPos);
 	}
 
 	/**
@@ -164,24 +120,20 @@ export default class InboxerPlugin extends Plugin {
 			editor,
 			this.settings.timelineHeadingText,
 		);
-		const insertPos = this.findInsertionPoint(editor, pos, level);
 
-		// Format the current date and time
-		const now = new Date();
-		const timestamp = now
-			.toISOString()
-			.replace(/T/, " ")
-			.replace(/\..+/, "")
-			.slice(0, 16); // Format as YYYY-MM-DD HH:MM
+		const content = editor.getValue();
+		const insertPos = findInsertionPointInText(content, pos, level);
+		const childHeadingText = createTimelineHeadingText(level);
 
-		const childHeadingText = `\n${"#".repeat(level + 1)} ${timestamp} `;
 		editor.replaceRange(childHeadingText, insertPos);
 
 		// Place cursor after the timestamp
-		editor.setCursor({
-			line: insertPos.line + 1,
-			ch: childHeadingText.length - 1,
-		});
+		const cursorPos = calculateCursorPosition(
+			insertPos,
+			childHeadingText,
+			true,
+		);
+		editor.setCursor(cursorPos);
 	}
 
 	async loadSettings() {
@@ -197,7 +149,7 @@ export default class InboxerPlugin extends Plugin {
 	}
 }
 
-class InboxerSettingTab extends PluginSettingTab {
+export class InboxerSettingTab extends PluginSettingTab {
 	plugin: InboxerPlugin;
 
 	constructor(app: App, plugin: InboxerPlugin) {
