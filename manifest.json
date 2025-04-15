@@ -1,7 +1,7 @@
 {
 	"id": "inboxer",
 	"name": "Inboxer",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"minAppVersion": "0.15.0",
 	"description": "Adds commands to quickly add entries to INBOX and TIMELINE sections",
 	"author": "Eoin Hurrell",
