@@ -72,7 +72,11 @@ jobs:
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v2
               with:
-                  files: obsidian-inboxer-*.zip
+                  files: |-
+                      main.js
+                      manifest.json
+                      styles.css
+                      obsidian-inboxer-*.zip
                   name: Version ${{ env.VERSION }}
                   body: |
                       ## Inboxer v${{ env.VERSION }}
