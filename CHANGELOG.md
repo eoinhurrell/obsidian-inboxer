@@ -1,4 +1,12 @@
 
+## [1.5.3] - 2025-05-06
+### :bug: Bug Fixes
+- [`6fa2901`](https://github.com/eoinhurrell/obsidian-inboxer/commit/6fa2901641242176c5748b6a241aa93295a8140a) - Pin Bun version for GitHub Action, and debug release kick-off *(commit by [@eoinhurrell](https://github.com/eoinhurrell))*
+- [`8193c50`](https://github.com/eoinhurrell/obsidian-inboxer/commit/8193c50322dfbc4dc5eb0d4355e650a8e79d74bb) - Skip release steps for debug release *(commit by [@eoinhurrell](https://github.com/eoinhurrell))*
+- [`b2c3698`](https://github.com/eoinhurrell/obsidian-inboxer/commit/b2c36988243ce59cc86b603bc44b9961a9f46ed4) - Pin bun types version and use types *(commit by [@eoinhurrell](https://github.com/eoinhurrell))*
+- [`c170bf6`](https://github.com/eoinhurrell/obsidian-inboxer/commit/c170bf61c4cc7a0e77ce8676c1cf4ce5dbee730a) - Add types for jest *(commit by [@eoinhurrell](https://github.com/eoinhurrell))*
+
+
 ## [1.4.5] - 2025-04-16
 ### :wrench: Chores
 - [`98710e7`](https://github.com/eoinhurrell/obsidian-inboxer/commit/98710e7995c5935001af4d82f8c1d4198fe9930c) - Fix build process *(commit by [@eoinhurrell](https://github.com/eoinhurrell))*
@@ -20,3 +28,4 @@
 [1.3.6]: https://github.com/eoinhurrell/obsidian-inboxer/compare/1.3.5...1.3.6
 [1.4.3]: https://github.com/eoinhurrell/obsidian-inboxer/compare/1.4.2...1.4.3
 [1.4.5]: https://github.com/eoinhurrell/obsidian-inboxer/compare/1.4.4...1.4.5
+[1.5.3]: https://github.com/eoinhurrell/obsidian-inboxer/compare/1.5.2...1.5.3
