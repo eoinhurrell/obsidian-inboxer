@@ -118,7 +118,9 @@ export function createTimelineHeadingText(
 	date: Date = new Date(),
 ): string {
 	// Format the current date and time
-	const timestamp = date
+	const timestamp = new Date(
+		date.getTime() - date.getTimezoneOffset() * 60000,
+	)
 		.toISOString()
 		.replace(/T/, " ")
 		.replace(/\..+/, "")
