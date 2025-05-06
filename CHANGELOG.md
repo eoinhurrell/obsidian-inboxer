@@ -1,4 +1,9 @@
 
+## [1.5.4] - 2025-05-06
+### :bug: Bug Fixes
+- [`a9e7010`](https://github.com/eoinhurrell/obsidian-inboxer/commit/a9e701088d88aa8b179b643489f8383aafe8e9e7) - Remove empty styles.css *(commit by [@eoinhurrell](https://github.com/eoinhurrell))*
+
+
 ## [1.5.3] - 2025-05-06
 ### :bug: Bug Fixes
 - [`6fa2901`](https://github.com/eoinhurrell/obsidian-inboxer/commit/6fa2901641242176c5748b6a241aa93295a8140a) - Pin Bun version for GitHub Action, and debug release kick-off *(commit by [@eoinhurrell](https://github.com/eoinhurrell))*
@@ -29,3 +34,4 @@
 [1.4.3]: https://github.com/eoinhurrell/obsidian-inboxer/compare/1.4.2...1.4.3
 [1.4.5]: https://github.com/eoinhurrell/obsidian-inboxer/compare/1.4.4...1.4.5
 [1.5.3]: https://github.com/eoinhurrell/obsidian-inboxer/compare/1.5.2...1.5.3
+[1.5.4]: https://github.com/eoinhurrell/obsidian-inboxer/compare/1.5.3...1.5.4
