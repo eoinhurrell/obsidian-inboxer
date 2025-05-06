@@ -36,7 +36,7 @@ export default class InboxerPlugin extends Plugin {
 		// Register the Add to Inbox command
 		this.addCommand({
 			id: "add-to-inbox",
-			name: "Add to Inbox",
+			name: "Add to file inbox",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				this.addToInbox(editor);
 			},
@@ -45,7 +45,7 @@ export default class InboxerPlugin extends Plugin {
 		// Register the Add to Timeline command
 		this.addCommand({
 			id: "add-to-timeline",
-			name: "Add to Timeline",
+			name: "Add to file timeline",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				this.addToTimeline(editor);
 			},
