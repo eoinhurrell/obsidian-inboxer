@@ -15,7 +15,7 @@
 	],
 	"author": "Eoin Hurrell",
 	"devDependencies": {
-		"@types/bun": "^1.2.9",
+		"@types/bun": "1.2.9",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"builtin-modules": "3.3.0",
