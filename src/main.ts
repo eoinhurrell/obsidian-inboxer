@@ -162,8 +162,6 @@ export class InboxerSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "Inbox & Timeline Settings" });
-
 		new Setting(containerEl)
 			.setName("Inbox heading text")
 			.setDesc(
