@@ -54,6 +54,7 @@ jobs:
                     echo "⚠️ Warning: Version $VERSION not found in versions.json"
                   fi
             - name: Update CHANGELOG
+              if: ${{ !startsWith(steps.tag.outputs.tag_name, 'debug-') }}
               id: changelog
               uses: requarks/changelog-action@v1
               with:
@@ -61,6 +62,7 @@ jobs:
                   tag: ${{ env.VERSION }}
 
             - name: Package plugin
+              if: ${{ !startsWith(steps.tag.outputs.tag_name, 'debug-') }}
               run: |
                   mkdir -p release
                   cp main.js manifest.json versions.json release/
@@ -71,6 +73,7 @@ jobs:
                   zip -r obsidian-inboxer-$VERSION.zip ./*
                   mv obsidian-inboxer-$VERSION.zip ../
             - name: Create GitHub Release
+              if: ${{ !startsWith(steps.tag.outputs.tag_name, 'debug-') }}
               uses: softprops/action-gh-release@v2
               with:
                   files: |-
@@ -96,6 +99,7 @@ jobs:
                   token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Commit CHANGELOG.md
+              if: ${{ !startsWith(steps.tag.outputs.tag_name, 'debug-') }}
               uses: stefanzweifel/git-auto-commit-action@v4
               with:
                   branch: master
