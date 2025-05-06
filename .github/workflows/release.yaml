@@ -79,7 +79,6 @@ jobs:
                   files: |-
                       main.js
                       manifest.json
-                      styles.css
                       obsidian-inboxer-*.zip
                   name: Version ${{ env.VERSION }}
                   body: |
