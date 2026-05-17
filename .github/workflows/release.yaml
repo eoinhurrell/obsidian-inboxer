@@ -61,17 +61,6 @@ jobs:
                   token: ${{ github.token }}
                   tag: ${{ env.VERSION }}
 
-            - name: Package plugin
-              if: ${{ !startsWith(steps.tag.outputs.tag_name, 'debug-') }}
-              run: |
-                  mkdir -p release
-                  cp main.js manifest.json versions.json release/
-                  if [ -f styles.css ]; then cp styles.css release/; fi
-
-                  # Create zip file
-                  cd release
-                  zip -r obsidian-inboxer-$VERSION.zip ./*
-                  mv obsidian-inboxer-$VERSION.zip ../
             - name: Create GitHub Release
               if: ${{ !startsWith(steps.tag.outputs.tag_name, 'debug-') }}
               uses: softprops/action-gh-release@v2
@@ -79,7 +68,6 @@ jobs:
                   files: |-
                       main.js
                       manifest.json
-                      obsidian-inboxer-*.zip
                   name: Version ${{ env.VERSION }}
                   body: |
                       ## Inboxer v${{ env.VERSION }}
@@ -90,8 +78,8 @@ jobs:
                       ${{ steps.changelog.outputs.changes }}
 
                       ### Installation
-                      1. Download the release zip file
-                      2. Unzip in your Obsidian vault's plugins folder: `.obsidian/plugins/`
+                      1. Download `main.js` and `manifest.json` from the release assets
+                      2. Place them in your Obsidian vault's plugins folder: `.obsidian/plugins/inboxer/`
                       3. Enable the plugin in Obsidian settings
                   draft: false
                   prerelease: false
