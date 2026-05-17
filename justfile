@@ -19,7 +19,8 @@ major:
 _release bump:
     #!/usr/bin/env bash
     set -eo pipefail
-    NEW_TAG=$(npm version "{{bump}}")
+    npm version "{{bump}}"
+    NEW_TAG=$(git describe --tags --abbrev=0)
     bun run build
     git push
     git push origin "$NEW_TAG"
