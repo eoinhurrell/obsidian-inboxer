@@ -19,7 +19,7 @@
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"esbuild": "0.25.0",
-		"obsidian": "latest",
+		"obsidian": ">=0.12.12",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
 	},
