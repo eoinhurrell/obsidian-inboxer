@@ -5,7 +5,10 @@ A simple Obsidian plugin that helps you organize notes with dedicated inbox and 
 ## Features
 
 - **Add to Inbox**: Add new headings under an "INBOX" section
+<img width="600" height="467" alt="cast-inbox" src="https://github.com/user-attachments/assets/35d3f3da-ae9a-4cca-afa8-c08caad723b1" />
+
 - **Add to Timeline**: Add timestamped entries under a "TIMELINE" section
+<img width="600" height="625" alt="cast-timeline" src="https://github.com/user-attachments/assets/950db113-d3ed-492a-a9f3-5fed67448694" />
 
 ## Settings
 
